@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UnitychanController : MonoBehaviour
 {
@@ -16,6 +17,16 @@ public class UnitychanController : MonoBehaviour
     private float velocityY = 10f;
     //左右の移動できる範囲
     private float movableRange = 3.4f;
+    //動きを減速させる係数
+    private float coefficient = 0.99f;
+    //ゲーム終了の判定
+    private bool isEnd = false;
+    //GemeResultTextを宣言
+    private GameObject gameResultText;
+    //ScoreTextを宣言
+    private GameObject scoreText;
+    //得点
+    private int score = 0;
 
     void Start()
     {
@@ -23,6 +34,10 @@ public class UnitychanController : MonoBehaviour
         this.myAnimator = GetComponent<Animator>();
         //このGameObjectのRigidbodyを取得
         this.myRigidbody = GetComponent<Rigidbody>();
+        //同じシーン内のGameResultTextを取得
+        this.gameResultText = GameObject.Find("GameResultText");
+        //同じシーン内のScoreTextを取得
+        this.scoreText = GameObject.Find("ScoreText");
 
 
         //走るアニメーションを開始
@@ -32,6 +47,16 @@ public class UnitychanController : MonoBehaviour
 
     void Update()
     {
+        //ゲーム終了なら動きを遅くする
+        if (this.isEnd)
+        {
+            //0.99fをかけ続けることで減速させている
+            this.velocityZ *= this.coefficient;
+            this.velocityX *= this.coefficient;
+            this.velocityY *= this.coefficient;
+            this.myAnimator.speed *= this.coefficient;
+        }
+
         //横方向の入力による速度
         float inputVelocityX = 0;
         //上方向の入力による速度
@@ -71,5 +96,37 @@ public class UnitychanController : MonoBehaviour
 
         //Unityちゃんに速度を与える
         this.myRigidbody.velocity = new Vector3(inputVelocityX, inputVelocityY, this.velocityZ);
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        //障害物に衝突した場合
+        if (other.gameObject.tag == "CarTag" || other.gameObject.tag == "TrafficConeTag")
+        {
+            this.isEnd = true;
+            this.gameResultText.GetComponent<Text>().text = "GAME OVER";
+        }
+
+        //ゴール地点に到達した場合
+        if (other.gameObject.tag == "GoalTag")
+        {
+            this.isEnd = true;
+            this.gameResultText.GetComponent<Text>().text = "CLEAR!!";
+        }
+
+        //コインに接触した場合
+        if (other.gameObject.tag == "CoinTag")
+        {
+            //スコア加算
+            this.score += 10;
+            //スコアテキスト再描画
+            this.scoreText.GetComponent<Text>().text = $"Score {this.score}pt";
+            //パーティクルを再生（追加）
+            GetComponent<ParticleSystem>().Play();
+            //破壊する
+            Destroy(other.gameObject);
+            
+        }
     }
 }
