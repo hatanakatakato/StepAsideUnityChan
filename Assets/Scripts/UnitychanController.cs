@@ -27,6 +27,13 @@ public class UnitychanController : MonoBehaviour
     private GameObject scoreText;
     //得点
     private int score = 0;
+    //左ボタン押したか
+    private bool isLButtonDown = false;
+    //右ボタン押下したか
+    private bool isRButtonDown = false;
+    //ジャンプボタン押したか
+    private bool isJButtonDown = false;
+
 
     void Start()
     {
@@ -63,19 +70,19 @@ public class UnitychanController : MonoBehaviour
         float inputVelocityY = 0;
 
         //Unityちゃんを矢印キーまたはボタンに応じて左右に移動させる
-        if (Input.GetKey(KeyCode.LeftArrow) && -this.movableRange < this.transform.position.x)
+        if ((Input.GetKey(KeyCode.LeftArrow) ||this.isLButtonDown)&& -this.movableRange < this.transform.position.x)
         {
             //左方向への速度を代入
             inputVelocityX = -this.velocityX;
         }
-        else if (Input.GetKey(KeyCode.RightArrow) && this.transform.position.x < this.movableRange)
+        else if ((Input.GetKey(KeyCode.RightArrow) || this.isRButtonDown)&& this.transform.position.x < this.movableRange)
         {
             //右方向への速度を代入
             inputVelocityX = this.velocityX;
         }
 
         //高さが0.5f以下の時にスペースキーが押されたらジャンプ
-        if (Input.GetKeyDown(KeyCode.Space) && this.transform.position.y < 0.5f)
+        if ((Input.GetKeyDown(KeyCode.Space) || this.isJButtonDown)&& this.transform.position.y < 0.5f)
         {
             //ジャンプアニメを再生
             this.myAnimator.SetBool("Jump", true);
@@ -128,5 +135,39 @@ public class UnitychanController : MonoBehaviour
             Destroy(other.gameObject);
             
         }
+    }
+
+    //ジャンプボタンを押した場合の処理
+    public void GetMyJumpButtonDown()
+    {
+        this.isJButtonDown = true;
+    }
+
+    //ジャンプボタンを離した場合の処理
+    public void GetMyJumpButtonUp()
+    {
+        this.isJButtonDown = false;
+    }
+
+    //左ボタンを押し続けた場合の処理
+    public void GetMyLeftButtonDown()
+    {
+        this.isLButtonDown = true;
+    }
+    //左ボタンを離した場合の処理
+    public void GetMyLeftButtonUp()
+    {
+        this.isLButtonDown = false;
+    }
+
+    //右ボタンを押し続けた場合の処理
+    public void GetMyRightButtonDown()
+    {
+        this.isRButtonDown = true;
+    }
+    //右ボタンを離した場合の処理
+    public void GetMyRightButtonUp()
+    {
+        this.isRButtonDown = false;
     }
 }
