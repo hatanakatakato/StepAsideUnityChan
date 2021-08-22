@@ -31,8 +31,9 @@ public class ItemGenerator : MonoBehaviour
 
     void Update()
     {
+
         //z軸60前方にアイテムを出現させ続ける(15区切りで）(goalまで）
-        if (this.nextItemAppearPosZ - this.unitychan.GetComponent<Transform>().transform.position.z < 60)
+        if (this.nextItemAppearPosZ - this.unitychan.GetComponent<Transform>().transform.position.z < 60 && this.nextItemAppearPosZ < this.goalPos)
         {
             
             //coneを出すかその他かランダムに決める
